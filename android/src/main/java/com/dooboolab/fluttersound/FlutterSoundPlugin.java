@@ -256,10 +256,11 @@ public class FlutterSoundPlugin implements MethodCallHandler, PluginRegistry.Req
   public void startRecorder(Integer numChannels, Integer sampleRate, Integer bitRate, t_CODEC codec, int androidEncoder, int androidAudioSource, int androidOutputFormat, String path, final Result result) {
     final int v = Build.VERSION.SDK_INT;
 
-      if ( sdkCompat.checkRecordPermission(reg) != PackageManager.PERMISSION_GRANTED) {
-          result.error(TAG, "NO PERMISSION GRANTED", Manifest.permission.RECORD_AUDIO + " or " + Manifest.permission.WRITE_EXTERNAL_STORAGE);
-          return;
-      }
+    // don't try to handle permissions if can NOT
+    if (reg.activity() != null && sdkCompat.checkRecordPermission(reg) != PackageManager.PERMISSION_GRANTED) {
+      result.error(TAG, "NO PERMISSION GRANTED", Manifest.permission.RECORD_AUDIO + " or " + Manifest.permission.WRITE_EXTERNAL_STORAGE);
+      return;
+    }
 
     // The caller must be allowed to specify its path. We must not change it here
     // path = PathUtils.getDataDirectory(reg.context()) + "/" + path; // SDK 29 : you may not write in getExternalStorageDirectory() [LARPOUX]
